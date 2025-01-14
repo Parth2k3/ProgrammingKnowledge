@@ -1,40 +1,49 @@
+
+
 import os
 from google.oauth2.service_account import Credentials
 from googleapiclient.discovery import build
-
+#STANDARD GOOGLE SHEETS API SETUP
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-SERVICE_ACCOUNT_FILE = 'gcp_key.json'
 
-credentials = Credentials.from_service_account_file(
-    SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+SERVICE_ACCOUNT_FILE = "gcp_key.json"
 
-# Build the Sheets API client
+credentials = Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+
 service = build('sheets', 'v4', credentials=credentials)
 
-spreadsheet_id = '1-DTUXcYKvl07WjAyQyEP3tLMQeDdZysZDhiEBCH2PSA'
-range_name = 'Sheet1!A1:A5'  # Example range
-
 sheet = service.spreadsheets()
-result = sheet.values().get(spreadsheetId=spreadsheet_id, range=range_name).execute()
 
-values = result.get('values', [])
-if not values:
-    print('No data found.')
-else:
-    for row in values:
-        print(row)
+sheet_id = '1-DTUXcYKvl07WjAyQyEP3tLMQeDdZysZDhiEBCH2PSA'
+
+range = 'A1:A5'
+###
+#READ SHEET FUNCTION
+sheet_read = sheet.values().get(spreadsheetId=sheet_id, range=range).execute()
+
+values = sheet_read.get('values', [])
+for row in values:
+    print(row)
+###
 
 
-
+#WRITE/UPDATE SHEET FUNCTION
 values = [
-    ['Name', 'Age'],
-    ['Alice', 25],
-    ['Bob', 30]
+    ['Hello', 'World'],
+    ['Hello2', 'World2']
 ]
 body = {'values': values}
 
-result = sheet.values().update(
-    spreadsheetId=spreadsheet_id, range='Sheet1!A1:B3',
-    valueInputOption='RAW', body=body).execute()
+sheet_write = sheet.values().update(spreadsheetId=sheet_id, range='A1:B2', valueInputOption='RAW', body=body).execute()
+sheet_read = sheet.values().get(spreadsheetId=sheet_id, range=range).execute()
+values = sheet_read.get('values', [])
+for row in values:
+    print(row)
+###
 
-print(f"{result.get('updatedCells')} cells updated.")
+#CLEAR SHEET FUNCTION
+sheet_clear = sheet.values().clear(spreadsheetId=sheet_id, range='A1:B2').execute()
+sheet_read = sheet.values().get(spreadsheetId=sheet_id, range=range).execute()
+values = sheet_read.get('values', [])
+for row in values:
+    print(row)
