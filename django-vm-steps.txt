@@ -1,0 +1,54 @@
+steps:-
+
+sudo apt update
+sudo apt install -y python3 python3-pip python3-venv
+sudo apt install nginx -y
+sudo apt install git -y
+git clone https://github.com/Parth2k3/test-flask.git
+pip3 install -r requirements.txt
+pip3 install gunicorn
+
+cd test-django/test
+nano settings.py
+ALLOWED_HOSTS = ['your.server.ip.address', 'yourdomain.com', 'localhost']
+[Unit]
+
+sudo nano /etc/systemd/system/gunicorn.service
+Description=gunicorn daemon for Django app
+After=network.target
+
+[Service]
+User=parth_nangroo
+Group=www-data
+WorkingDirectory=/home/parth_nangroo/test-django
+Environment="PATH=/home/yourusername/venv/bin"
+ExecStart=/home/yourusername/venv/bin/gunicorn --access-logfile - --workers 3 --bind unix:/home/yourusername/yourapp/yourapp.sock yourapp.wsgi:application
+
+
+[Install]
+WantedBy=multi-user.target
+
+
+sudo systemctl daemon-reload
+sudo systemctl start gunicorn
+sudo systemctl enable gunicorn
+sudo systemctl status gunicorn
+
+sudo nano /etc/nginx/sites-available/test-django
+server {
+    listen 80;
+    server_name 34.58.240.57;
+
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location /static/ {
+        root /home/parth_nangroo/test-django;
+    }
+
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/home/parth_nangroo/test-django/test.sock;
+    }
+}
+sudo ln -s /etc/nginx/sites-available/yourapp /etc/nginx/sites-enabled
+sudo nginx -t
+sudo systemctl restart nginx
