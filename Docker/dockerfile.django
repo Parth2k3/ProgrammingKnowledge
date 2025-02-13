@@ -1,26 +1,15 @@
-# Use an official Python image as the base
 FROM python:3.9-slim
 
-# Set the working directory in the container
 WORKDIR /app
 
-# Install system dependencies
-RUN apt-get update && apt-get install -y \
-    gcc \
-    libpq-dev \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y libpq-dev gcc
 
-# Copy the requirements file to the container
 COPY ./django_app/requirements.txt .
 
-# Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the application code to the container
 COPY ./django_app .
 
-# Expose the port that Django runs on
 EXPOSE 8000
 
-# Command to run the Django app
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["gunicorn", "--workers", "3", "--bind", "0.0.0.0:8000", "django_app.wsgi:application"]
