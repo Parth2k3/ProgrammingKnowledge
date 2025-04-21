@@ -1,12 +1,9 @@
-# schemas.py
 from pydantic import BaseModel
 
 class UserCreate(BaseModel):
-    name: str
-    email: str
+    username: str
+    password: str
 
-class UserOut(UserCreate):
-    id: int
-
-    class Config:
-        orm_mode = True
+class UserLogin(BaseModel):
+    username: str
+    password: str
