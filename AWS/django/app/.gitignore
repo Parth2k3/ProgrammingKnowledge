@@ -1,14 +1,4 @@
-venv
-venv/
-/venv/
-*.json
-cloud_key.json
-gcp_key.json
-*.jpg
-*.wav
-*.mp3
-*.png
-*.jpeg
+
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
